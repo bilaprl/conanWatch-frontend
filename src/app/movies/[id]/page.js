@@ -10,7 +10,7 @@ export default function MovieDetail() {
   const { id } = useParams();
   const { isAuthenticated } = useAuth();
   const [movie, setMovie] = useState(null);
-  const [reviews, setReviews] = useState([]); 
+  const [reviews, setReviews] = useState([]);
   const [reviewForm, setReviewForm] = useState({ rating: "5", text: "" });
   const [loadingReviews, setLoadingReviews] = useState(true);
 
@@ -24,7 +24,9 @@ export default function MovieDetail() {
   const fetchReviews = async () => {
     try {
       // BERUBAH: Menggunakan environment variable
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reviews/${id}`);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "")}/api/reviews/${id}`,
+      );
       const data = await response.json();
       if (response.ok) {
         setReviews(data);
@@ -55,19 +57,22 @@ export default function MovieDetail() {
       const username = localStorage.getItem("username");
 
       // BERUBAH: Menggunakan environment variable
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reviews/add`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "")}/api/reviews/add`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            movieId: id,
+            username: username || "Agen Rahasia",
+            rating: parseInt(reviewForm.rating),
+            text: reviewForm.text,
+          }),
         },
-        body: JSON.stringify({
-          movieId: id,
-          username: username || "Agen Rahasia",
-          rating: parseInt(reviewForm.rating),
-          text: reviewForm.text,
-        }),
-      });
+      );
 
       if (response.ok) {
         const savedReview = await response.json();
@@ -84,23 +89,28 @@ export default function MovieDetail() {
     try {
       const token = localStorage.getItem("token");
       // BERUBAH: Menggunakan environment variable
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reviews/${reviewId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "")}/api/reviews/${reviewId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            text: newText,
+            rating: parseInt(newRating),
+          }),
         },
-        body: JSON.stringify({
-          text: newText,
-          rating: parseInt(newRating),
-        }),
-      });
+      );
 
       if (response.ok) {
         setReviews((prev) =>
           prev.map((rev) =>
-            rev._id === reviewId ? { ...rev, text: newText, rating: parseInt(newRating) } : rev
-          )
+            rev._id === reviewId
+              ? { ...rev, text: newText, rating: parseInt(newRating) }
+              : rev,
+          ),
         );
         alert("200 OK: Data laporan berhasil dimodifikasi.");
       }
@@ -115,12 +125,15 @@ export default function MovieDetail() {
     try {
       const token = localStorage.getItem("token");
       // BERUBAH: Menggunakan environment variable
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reviews/${reviewId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "")}/api/reviews/${reviewId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       if (response.ok) {
         setReviews((prev) => prev.filter((rev) => rev._id !== reviewId));
@@ -140,21 +153,26 @@ export default function MovieDetail() {
     try {
       const token = localStorage.getItem("token");
       // BERUBAH: Menggunakan environment variable
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/watchlist/add`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "")}/api/watchlist/add`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            movieId: id,
+            status: "pending",
+          }),
         },
-        body: JSON.stringify({
-          movieId: id,
-          status: "pending",
-        }),
-      });
+      );
 
       const data = await response.json();
       if (response.ok) {
-        alert(`200 OK: Case File "${movie.title}" berhasil diarsipkan di database pusat.`);
+        alert(
+          `200 OK: Case File "${movie.title}" berhasil diarsipkan di database pusat.`,
+        );
       } else {
         alert(`Gagal: ${data.message}`);
       }
@@ -201,16 +219,23 @@ export default function MovieDetail() {
                 <span className="px-2 py-1 md:px-3 md:py-1 bg-secondary text-white text-[8px] md:text-[10px] font-black uppercase italic tracking-tighter">
                   Case File M-{movie.id}
                 </span>
-                <span className="text-white/50 text-[10px] md:text-xs font-bold">{movie.year}</span>
+                <span className="text-white/50 text-[10px] md:text-xs font-bold">
+                  {movie.year}
+                </span>
               </div>
               <h1 className="text-3xl md:text-7xl font-heading font-black text-white leading-[1.1] md:leading-none uppercase tracking-tighter mb-4 drop-shadow-xl">
                 {movie.title}
               </h1>
               <div className="flex items-center gap-4 md:gap-6">
                 <div className="flex items-center gap-2 text-accent">
-                  <span className="material-icons text-lg md:text-xl">star</span>
+                  <span className="material-icons text-lg md:text-xl">
+                    star
+                  </span>
                   <span className="text-xl md:text-2xl font-black tracking-tighter">
-                    {movie.rating} <span className="text-[10px] md:text-xs text-white/40">/ 5.0</span>
+                    {movie.rating}{" "}
+                    <span className="text-[10px] md:text-xs text-white/40">
+                      / 5.0
+                    </span>
                   </span>
                 </div>
                 <div className="h-6 md:h-8 w-[1px] bg-white/20"></div>
@@ -227,7 +252,8 @@ export default function MovieDetail() {
         <div className="lg:col-span-4 space-y-8">
           <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 md:p-8 shadow-2xl relative overflow-hidden group">
             <h3 className="font-heading font-black text-white mb-4 md:mb-6 text-lg md:text-xl uppercase tracking-tighter flex items-center gap-2">
-              <span className="w-1.5 h-5 md:w-2 md:h-6 bg-secondary"></span> Case Synopsis
+              <span className="w-1.5 h-5 md:w-2 md:h-6 bg-secondary"></span>{" "}
+              Case Synopsis
             </h3>
             <p className="text-gray-300 text-xs md:text-sm leading-relaxed mb-6 md:mb-8 italic font-body">
               "{movie.desc}"
@@ -239,7 +265,9 @@ export default function MovieDetail() {
               <span className="material-icons-outlined group-hover:rotate-12 transition-transform text-sm md:text-base">
                 bookmark_add
               </span>
-              <span className="tracking-widest text-[10px] md:text-xs">ADD TO WATCHLIST</span>
+              <span className="tracking-widest text-[10px] md:text-xs">
+                ADD TO WATCHLIST
+              </span>
             </button>
           </div>
         </div>
@@ -251,12 +279,19 @@ export default function MovieDetail() {
             </h3>
             <p className="text-[9px] md:text-xs text-white/40 mb-6 md:mb-8 tracking-widest uppercase font-bold">
               Status:{" "}
-              <span className={isAuthenticated ? "text-secondary italic" : "text-white/20"}>
+              <span
+                className={
+                  isAuthenticated ? "text-secondary italic" : "text-white/20"
+                }
+              >
                 {isAuthenticated ? "AUTHORIZED_PERSONNEL" : "ACCESS_DENIED"}
               </span>
             </p>
 
-            <form onSubmit={handleReviewSubmit} className="space-y-6 md:space-y-8">
+            <form
+              onSubmit={handleReviewSubmit}
+              className="space-y-6 md:space-y-8"
+            >
               <div className="space-y-3 md:space-y-4">
                 <label className="text-[9px] md:text-[10px] font-black text-secondary uppercase tracking-[0.3em] md:tracking-[0.4em] flex items-center gap-2">
                   <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-secondary animate-pulse rounded-full"></span>
@@ -274,7 +309,9 @@ export default function MovieDetail() {
                     <button
                       key={rank.val}
                       type="button"
-                      onClick={() => setReviewForm({ ...reviewForm, rating: rank.val })}
+                      onClick={() =>
+                        setReviewForm({ ...reviewForm, rating: rank.val })
+                      }
                       className={`relative p-2 md:p-4 border transition-all duration-500 group overflow-hidden ${
                         reviewForm.rating === rank.val
                           ? "border-secondary bg-secondary/10 shadow-[0_0_15px_rgba(200,16,46,0.2)]"
@@ -296,7 +333,9 @@ export default function MovieDetail() {
                         </span>
                         <span
                           className={`text-[7px] md:text-[8px] font-bold uppercase tracking-widest transition-colors ${
-                            reviewForm.rating === rank.val ? "text-white" : "text-white/20"
+                            reviewForm.rating === rank.val
+                              ? "text-white"
+                              : "text-white/20"
                           }`}
                         >
                           {rank.desc}
@@ -312,7 +351,9 @@ export default function MovieDetail() {
                   rows="4"
                   required
                   value={reviewForm.text}
-                  onChange={(e) => setReviewForm({ ...reviewForm, text: e.target.value })}
+                  onChange={(e) =>
+                    setReviewForm({ ...reviewForm, text: e.target.value })
+                  }
                   className="w-full bg-primary/50 border border-white/10 text-white text-xs md:text-sm p-3 md:p-4 focus:border-secondary outline-none transition-colors font-body italic"
                   placeholder="Analyze the plot, characters, and deductions here..."
                 ></textarea>
@@ -329,12 +370,15 @@ export default function MovieDetail() {
 
           <div className="space-y-6">
             <h3 className="font-heading font-black text-white text-xl md:text-2xl uppercase tracking-tighter flex items-center gap-3 md:gap-4">
-              Intelligence Feed <span className="h-[1px] md:h-[2px] flex-grow bg-white/5"></span>
+              Intelligence Feed{" "}
+              <span className="h-[1px] md:h-[2px] flex-grow bg-white/5"></span>
             </h3>
 
             <div className="grid grid-cols-1 gap-4">
               {loadingReviews ? (
-                <p className="text-white/20 text-xs italic animate-pulse">Scanning feed...</p>
+                <p className="text-white/20 text-xs italic animate-pulse">
+                  Scanning feed...
+                </p>
               ) : reviews.length === 0 ? (
                 <div className="py-12 md:py-20 text-center border border-dashed border-white/5">
                   <p className="text-xs md:text-sm text-white/30 italic uppercase tracking-widest">
