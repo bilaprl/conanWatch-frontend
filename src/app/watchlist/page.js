@@ -147,8 +147,12 @@ export default function WatchlistPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
             {filteredList.map((item) => {
-              const movie = moviesData.find((m) => m.id === parseInt(item.movieId));
-              if (!movie) return null;
+              const movie = moviesData.find((m) => Number(m.id) === Number(item.movieId));
+
+              if (!movie) {
+                console.log("Film tidak ditemukan untuk ID:", item.movieId);
+                return null;
+              }
 
               return (
                 <Link
