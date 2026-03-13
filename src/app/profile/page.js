@@ -33,8 +33,8 @@ export default function ProfilePage() {
       const token = localStorage.getItem("token");
       // BERUBAH: Menggunakan environment variable
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/update-profile`,
-        {
+  `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "")}/api/auth/update-profile`,
+  {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -66,14 +66,13 @@ export default function ProfilePage() {
     if (confirmDelete) {
       try {
         const token = localStorage.getItem("token");
-        // BERUBAH: Menggunakan environment variable
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/auth/delete-account`,
-          {
-            method: "DELETE",
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+       const response = await fetch(
+  `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "")}/api/auth/delete-account`,
+  {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  }
+);
         if (response.ok) {
           localStorage.clear();
           window.dispatchEvent(new Event("storage"));
