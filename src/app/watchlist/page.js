@@ -25,11 +25,11 @@ export default function WatchlistPage() {
 
       try {
         // BERUBAH: Menggunakan environment variable
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/watchlist`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "")}/api/watchlist`, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
 
         if (response.ok) {
           const data = await response.json();
@@ -55,13 +55,13 @@ export default function WatchlistPage() {
       try {
         const token = localStorage.getItem("token");
         // BERUBAH: Menggunakan environment variable
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/watchlist/${idToRemove}`,
-          {
-            method: "DELETE",
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+       const response = await fetch(
+  `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "")}/api/watchlist/${idToRemove}`,
+  {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  }
+);
 
         if (response.ok) {
           setWatchlist(watchlist.filter((item) => item._id !== idToRemove));
@@ -78,17 +78,17 @@ export default function WatchlistPage() {
     try {
       const token = localStorage.getItem("token");
       // BERUBAH: Menggunakan environment variable
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/watchlist/${mongoId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ status: "solved" }),
-        }
-      );
+     const response = await fetch(
+  `${process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "")}/api/watchlist/${mongoId}`,
+  {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ status: "solved" }),
+  }
+);
 
       if (response.ok) {
         setWatchlist(
